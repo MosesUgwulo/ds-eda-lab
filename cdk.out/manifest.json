@@ -17,7 +17,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-eu-west-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-eu-west-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-eu-west-1/59fce91e20f1a965ac30fd3d667a774b22962246e510d5539b91d7f4422f8f7f.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-eu-west-1/ccd0ac642bce8e1f400a315391fe21c79c735ac37238677c40d44eebb02053b2.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -79,6 +79,18 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "imgcreatedqueuePolicyE807AE11"
+          }
+        ],
+        "/EDAStack/img-created-queue/EDAStackNewImageTopicD12C2BE8/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "imgcreatedqueueEDAStackNewImageTopicD12C2BE856F43343"
+          }
+        ],
+        "/EDAStack/NewImageTopic/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NewImageTopic7927ABDB"
           }
         ],
         "/EDAStack/ProcessImageFn/ServiceRole/Resource": [

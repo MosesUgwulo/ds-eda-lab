@@ -122,6 +122,7 @@
     "Managed": true
    },
    "DependsOn": [
+    "imgcreatedqueueEDAStackNewImageTopicD12C2BE856F43343",
     "imgcreatedqueuePolicyE807AE11",
     "imgcreatedqueueB98FF37D"
    ],
@@ -237,6 +238,26 @@
          "Arn"
         ]
        }
+      },
+      {
+       "Action": "sqs:SendMessage",
+       "Condition": {
+        "ArnEquals": {
+         "aws:SourceArn": {
+          "Ref": "NewImageTopic7927ABDB"
+         }
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "sns.amazonaws.com"
+       },
+       "Resource": {
+        "Fn::GetAtt": [
+         "imgcreatedqueueB98FF37D",
+         "Arn"
+        ]
+       }
       }
      ],
      "Version": "2012-10-17"
@@ -249,6 +270,36 @@
    },
    "Metadata": {
     "aws:cdk:path": "EDAStack/img-created-queue/Policy/Resource"
+   }
+  },
+  "imgcreatedqueueEDAStackNewImageTopicD12C2BE856F43343": {
+   "Type": "AWS::SNS::Subscription",
+   "Properties": {
+    "Endpoint": {
+     "Fn::GetAtt": [
+      "imgcreatedqueueB98FF37D",
+      "Arn"
+     ]
+    },
+    "Protocol": "sqs",
+    "TopicArn": {
+     "Ref": "NewImageTopic7927ABDB"
+    }
+   },
+   "DependsOn": [
+    "imgcreatedqueuePolicyE807AE11"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "EDAStack/img-created-queue/EDAStackNewImageTopicD12C2BE8/Resource"
+   }
+  },
+  "NewImageTopic7927ABDB": {
+   "Type": "AWS::SNS::Topic",
+   "Properties": {
+    "DisplayName": "New Image topic"
+   },
+   "Metadata": {
+    "aws:cdk:path": "EDAStack/NewImageTopic/Resource"
    }
   },
   "ProcessImageFnServiceRoleD858855F": {
@@ -357,7 +408,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-eu-west-1"
      },
-     "S3Key": "e0184e043347416364526dee36b5fe92e0527f13da771d10f935619043994e2b.zip"
+     "S3Key": "aaddab8a69441b4da596efbbbc05d5923700f181dcc4d185e32ed14c3d69dcf4.zip"
     },
     "Environment": {
      "Variables": {
@@ -381,7 +432,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "EDAStack/ProcessImageFn/Resource",
-    "aws:asset:path": "asset.e0184e043347416364526dee36b5fe92e0527f13da771d10f935619043994e2b",
+    "aws:asset:path": "asset.aaddab8a69441b4da596efbbbc05d5923700f181dcc4d185e32ed14c3d69dcf4",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
@@ -491,7 +542,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/2WQz07DMAzGn4V7ahi79MomuA1G9wBVlprJ/ZOUOilCUd6dJi3rEJd89hf7Z9mPkOfwcCe/OFNVk7V0Bn+yUjViskrPW/A7pxq0Yv+hl2iWo2lJfa/2ks/JTjIGwZ8M/t2hw1g2B+lde2/SIFrZnStZalNhzfCa5MVpZcloQbIDX5g2sZKulF8Ab0vJjJbhKcoCBD+VXDnPI2p7Mm5QeJB9T/oSCf/dEMTesTVdgZz8NPca//k6DmakCgeRxk73u0TsbeObs72zQcTdoOb7cZPDJl6+ZqJscNpSh1DM+gPTLpa2lQEAAA=="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/2VRy07DMBD8Fu7uQuklV1rBDSgJ98hxlmrzsEPWDkJW/p3YiZJWXDw74/GMbD9CksDDnfzhnSrrXUMF+MxKVYtJyj0fwB+dqtGK05dephnOpiH1u8kLn8lRMo6Cvxn8h0OHwTYPcd3OXtHJryd/5gpWPXWWjA6OG/5pOlJBjcMoGtkWpcy1KbFieIvw4rSKZpIt+NQ0sT3i1rtWHnLJjJbhKcASCH6yrDnPA2qbGdcrfJVdR/oSEv6r4yhOjq1pU+Sox951vtk692agEnsRa6cXv4TY64PvznbOjiLcDSq+H/YJ7MNfVUy065221CKkM/4B5Ts9kscBAAA="
    },
    "Metadata": {
     "aws:cdk:path": "EDAStack/CDKMetadata/Default"

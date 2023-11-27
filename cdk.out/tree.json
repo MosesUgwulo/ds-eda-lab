@@ -232,6 +232,26 @@
                                   "Arn"
                                 ]
                               }
+                            },
+                            {
+                              "Action": "sqs:SendMessage",
+                              "Condition": {
+                                "ArnEquals": {
+                                  "aws:SourceArn": {
+                                    "Ref": "NewImageTopic7927ABDB"
+                                  }
+                                }
+                              },
+                              "Effect": "Allow",
+                              "Principal": {
+                                "Service": "sns.amazonaws.com"
+                              },
+                              "Resource": {
+                                "Fn::GetAtt": [
+                                  "imgcreatedqueueB98FF37D",
+                                  "Arn"
+                                ]
+                              }
                             }
                           ],
                           "Version": "2012-10-17"
@@ -253,10 +273,67 @@
                   "fqn": "aws-cdk-lib.aws_sqs.QueuePolicy",
                   "version": "2.88.0"
                 }
+              },
+              "EDAStackNewImageTopicD12C2BE8": {
+                "id": "EDAStackNewImageTopicD12C2BE8",
+                "path": "EDAStack/img-created-queue/EDAStackNewImageTopicD12C2BE8",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "EDAStack/img-created-queue/EDAStackNewImageTopicD12C2BE8/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::SNS::Subscription",
+                      "aws:cdk:cloudformation:props": {
+                        "endpoint": {
+                          "Fn::GetAtt": [
+                            "imgcreatedqueueB98FF37D",
+                            "Arn"
+                          ]
+                        },
+                        "protocol": "sqs",
+                        "topicArn": {
+                          "Ref": "NewImageTopic7927ABDB"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_sns.CfnSubscription",
+                      "version": "2.88.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_sns.Subscription",
+                  "version": "2.88.0"
+                }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_sqs.Queue",
+              "version": "2.88.0"
+            }
+          },
+          "NewImageTopic": {
+            "id": "NewImageTopic",
+            "path": "EDAStack/NewImageTopic",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "EDAStack/NewImageTopic/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::SNS::Topic",
+                  "aws:cdk:cloudformation:props": {
+                    "displayName": "New Image topic"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_sns.CfnTopic",
+                  "version": "2.88.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_sns.Topic",
               "version": "2.88.0"
             }
           },
@@ -437,7 +514,7 @@
                       "s3Bucket": {
                         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-eu-west-1"
                       },
-                      "s3Key": "e0184e043347416364526dee36b5fe92e0527f13da771d10f935619043994e2b.zip"
+                      "s3Key": "aaddab8a69441b4da596efbbbc05d5923700f181dcc4d185e32ed14c3d69dcf4.zip"
                     },
                     "environment": {
                       "variables": {
