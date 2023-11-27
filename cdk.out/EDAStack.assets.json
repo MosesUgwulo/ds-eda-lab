@@ -29,7 +29,21 @@
         }
       }
     },
-    "ccd0ac642bce8e1f400a315391fe21c79c735ac37238677c40d44eebb02053b2": {
+    "c7e795ae4aea550b0f4a11483c92426873aae090f26d553633edb0db0fea59da": {
+      "source": {
+        "path": "asset.c7e795ae4aea550b0f4a11483c92426873aae090f26d553633edb0db0fea59da",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "current_account-eu-west-1": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-eu-west-1",
+          "objectKey": "c7e795ae4aea550b0f4a11483c92426873aae090f26d553633edb0db0fea59da.zip",
+          "region": "eu-west-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-eu-west-1"
+        }
+      }
+    },
+    "52655b7848cd9417ca54d757ee79d62a8ed26a72f0673e2b0adda2347a091d48": {
       "source": {
         "path": "EDAStack.template.json",
         "packaging": "file"
@@ -37,7 +51,7 @@
       "destinations": {
         "current_account-eu-west-1": {
           "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-eu-west-1",
-          "objectKey": "ccd0ac642bce8e1f400a315391fe21c79c735ac37238677c40d44eebb02053b2.json",
+          "objectKey": "52655b7848cd9417ca54d757ee79d62a8ed26a72f0673e2b0adda2347a091d48.json",
           "region": "eu-west-1",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-eu-west-1"
         }

@@ -105,16 +105,13 @@
      "Ref": "images9BF4DCD5"
     },
     "NotificationConfiguration": {
-     "QueueConfigurations": [
+     "TopicConfigurations": [
       {
        "Events": [
         "s3:ObjectCreated:*"
        ],
-       "QueueArn": {
-        "Fn::GetAtt": [
-         "imgcreatedqueueB98FF37D",
-         "Arn"
-        ]
+       "TopicArn": {
+        "Ref": "NewImageTopic7927ABDB"
        }
       }
      ]
@@ -122,9 +119,8 @@
     "Managed": true
    },
    "DependsOn": [
-    "imgcreatedqueueEDAStackNewImageTopicD12C2BE856F43343",
-    "imgcreatedqueuePolicyE807AE11",
-    "imgcreatedqueueB98FF37D"
+    "NewImageTopicPolicy710AE2A8",
+    "NewImageTopic7927ABDB"
    ],
    "Metadata": {
     "aws:cdk:path": "EDAStack/images/Notifications/Resource"
@@ -213,33 +209,6 @@
     "PolicyDocument": {
      "Statement": [
       {
-       "Action": [
-        "sqs:GetQueueAttributes",
-        "sqs:GetQueueUrl",
-        "sqs:SendMessage"
-       ],
-       "Condition": {
-        "ArnLike": {
-         "aws:SourceArn": {
-          "Fn::GetAtt": [
-           "images9BF4DCD5",
-           "Arn"
-          ]
-         }
-        }
-       },
-       "Effect": "Allow",
-       "Principal": {
-        "Service": "s3.amazonaws.com"
-       },
-       "Resource": {
-        "Fn::GetAtt": [
-         "imgcreatedqueueB98FF37D",
-         "Arn"
-        ]
-       }
-      },
-      {
        "Action": "sqs:SendMessage",
        "Condition": {
         "ArnEquals": {
@@ -293,6 +262,76 @@
     "aws:cdk:path": "EDAStack/img-created-queue/EDAStackNewImageTopicD12C2BE8/Resource"
    }
   },
+  "mailerqueueC56E331C": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "ReceiveMessageWaitTimeSeconds": 10
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "EDAStack/mailer-queue/Resource"
+   }
+  },
+  "mailerqueuePolicyD1A1678C": {
+   "Type": "AWS::SQS::QueuePolicy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sqs:SendMessage",
+       "Condition": {
+        "ArnEquals": {
+         "aws:SourceArn": {
+          "Ref": "NewImageTopic7927ABDB"
+         }
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "sns.amazonaws.com"
+       },
+       "Resource": {
+        "Fn::GetAtt": [
+         "mailerqueueC56E331C",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Queues": [
+     {
+      "Ref": "mailerqueueC56E331C"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "EDAStack/mailer-queue/Policy/Resource"
+   }
+  },
+  "mailerqueueEDAStackNewImageTopicD12C2BE84E1E546B": {
+   "Type": "AWS::SNS::Subscription",
+   "Properties": {
+    "Endpoint": {
+     "Fn::GetAtt": [
+      "mailerqueueC56E331C",
+      "Arn"
+     ]
+    },
+    "Protocol": "sqs",
+    "TopicArn": {
+     "Ref": "NewImageTopic7927ABDB"
+    }
+   },
+   "DependsOn": [
+    "mailerqueuePolicyD1A1678C"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "EDAStack/mailer-queue/EDAStackNewImageTopicD12C2BE8/Resource"
+   }
+  },
   "NewImageTopic7927ABDB": {
    "Type": "AWS::SNS::Topic",
    "Properties": {
@@ -300,6 +339,45 @@
    },
    "Metadata": {
     "aws:cdk:path": "EDAStack/NewImageTopic/Resource"
+   }
+  },
+  "NewImageTopicPolicy710AE2A8": {
+   "Type": "AWS::SNS::TopicPolicy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sns:Publish",
+       "Condition": {
+        "ArnLike": {
+         "aws:SourceArn": {
+          "Fn::GetAtt": [
+           "images9BF4DCD5",
+           "Arn"
+          ]
+         }
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "s3.amazonaws.com"
+       },
+       "Resource": {
+        "Ref": "NewImageTopic7927ABDB"
+       },
+       "Sid": "0"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Topics": [
+     {
+      "Ref": "NewImageTopic7927ABDB"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "EDAStack/NewImageTopic/Policy/Resource"
    }
   },
   "ProcessImageFnServiceRoleD858855F": {
@@ -456,6 +534,139 @@
     "aws:cdk:path": "EDAStack/ProcessImageFn/SqsEventSource:EDAStackimgcreatedqueue852C6AE9/Resource"
    }
   },
+  "mailerfunctionServiceRole3352EDD5": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "EDAStack/mailer-function/ServiceRole/Resource"
+   }
+  },
+  "mailerfunctionServiceRoleDefaultPolicy277D7D8B": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "sqs:ChangeMessageVisibility",
+        "sqs:DeleteMessage",
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:ReceiveMessage"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "mailerqueueC56E331C",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "ses:SendEmail",
+        "ses:SendRawEmail",
+        "ses:SendTemplatedEmail"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "mailerfunctionServiceRoleDefaultPolicy277D7D8B",
+    "Roles": [
+     {
+      "Ref": "mailerfunctionServiceRole3352EDD5"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "EDAStack/mailer-function/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "mailerfunction0BFEF8E7": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-eu-west-1"
+     },
+     "S3Key": "c7e795ae4aea550b0f4a11483c92426873aae090f26d553633edb0db0fea59da.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1"
+     }
+    },
+    "Handler": "index.handler",
+    "MemorySize": 1024,
+    "Role": {
+     "Fn::GetAtt": [
+      "mailerfunctionServiceRole3352EDD5",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs16.x",
+    "Timeout": 3
+   },
+   "DependsOn": [
+    "mailerfunctionServiceRoleDefaultPolicy277D7D8B",
+    "mailerfunctionServiceRole3352EDD5"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "EDAStack/mailer-function/Resource",
+    "aws:asset:path": "asset.c7e795ae4aea550b0f4a11483c92426873aae090f26d553633edb0db0fea59da",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "mailerfunctionSqsEventSourceEDAStackmailerqueue91FA78B34B0788D0": {
+   "Type": "AWS::Lambda::EventSourceMapping",
+   "Properties": {
+    "BatchSize": 5,
+    "EventSourceArn": {
+     "Fn::GetAtt": [
+      "mailerqueueC56E331C",
+      "Arn"
+     ]
+    },
+    "FunctionName": {
+     "Ref": "mailerfunction0BFEF8E7"
+    },
+    "MaximumBatchingWindowInSeconds": 10
+   },
+   "Metadata": {
+    "aws:cdk:path": "EDAStack/mailer-function/SqsEventSource:EDAStackmailerqueue91FA78B3/Resource"
+   }
+  },
   "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC": {
    "Type": "AWS::IAM::Role",
    "Properties": {
@@ -542,7 +753,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/2VRy07DMBD8Fu7uQuklV1rBDSgJ98hxlmrzsEPWDkJW/p3YiZJWXDw74/GMbD9CksDDnfzhnSrrXUMF+MxKVYtJyj0fwB+dqtGK05dephnOpiH1u8kLn8lRMo6Cvxn8h0OHwTYPcd3OXtHJryd/5gpWPXWWjA6OG/5pOlJBjcMoGtkWpcy1KbFieIvw4rSKZpIt+NQ0sT3i1rtWHnLJjJbhKcASCH6yrDnPA2qbGdcrfJVdR/oSEv6r4yhOjq1pU+Sox951vtk692agEnsRa6cXv4TY64PvznbOjiLcDSq+H/YJ7MNfVUy065221CKkM/4B5Ts9kscBAAA="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/2VRTU+EMBD9Ld7L6LoXru5Gb+oK3kkpdTN8tMi0GNPw36UtATZe5s17ffPaZh4hTeHhjv9QIqomabEElxsuGjZLhaMjuJMVjTTs/KWWLsJFtyh+N3nhkZw4yYnRN4H7sNJKb4tNqNvsjs5+NftzW5IYsDeolXfc8E/do/BqbELdwnZ0Yi3vyooXSleyJngL8GKVCDnIO3CZbsPDAm4p62uOBSeShuDJwxIIbrasOc+jVCbXdhDylfc9qqtP+K9OEztbMrrLJAU93Lv2N0eXQY9YyYGFa+dlXH3sfvDdmt6aifm/QU334yGFg19jTYjJYJXBTkIW8Q/WpvwU4gEAAA=="
    },
    "Metadata": {
     "aws:cdk:path": "EDAStack/CDKMetadata/Default"
