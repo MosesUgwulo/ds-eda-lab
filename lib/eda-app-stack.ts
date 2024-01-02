@@ -38,7 +38,6 @@ export class EDAAppStack extends cdk.Stack {
   });
 
 
-
   // Lambda functions
 
   const processImageFn = new lambdanode.NodejsFunction(
@@ -70,7 +69,10 @@ export class EDAAppStack extends cdk.Stack {
   newImageTopic.addSubscription(
     new subs.SqsSubscription(imageProcessQueue)
   );
-  newImageTopic.addSubscription(new subs.SqsSubscription(mailerQ));
+
+  newImageTopic.addSubscription(
+    new subs.SqsSubscription(mailerQ)
+  );
 
     // EVENT SOURCE ===============================================================================
 
